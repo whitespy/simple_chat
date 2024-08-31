@@ -1,0 +1,23 @@
+[project]
+name = "simple_chat"
+authors = [
+    {name = "Andrey Butenko", email = "whitespysoftware@gmail.com"},
+]
+readme = "README.md"
+requires-python = "==3.12.*"
+
+[tool.black]
+target-version = ["py312"]
+
+[tool.isort]
+profile = "black"
+known_django = ["django"]
+known_first_party = ["simple_chat"]
+sections = [
+    "FUTURE",
+    "STDLIB",
+    "THIRDPARTY",
+    "DJANGO",
+    "FIRSTPARTY",
+    "LOCALFOLDER",
+]

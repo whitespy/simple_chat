@@ -1,0 +1,6 @@
+*.py[cow]
+.idea
+.env
+
+var/
+/simple_chat_db.sqlite3
