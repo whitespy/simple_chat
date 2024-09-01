@@ -1,5 +1,6 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import mixins, status, viewsets
+from drf_spectacular.utils import extend_schema, extend_schema_view, inline_serializer
+from rest_framework import mixins, serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
@@ -17,6 +18,10 @@ from .serializers import (
 )
 
 
+@extend_schema_view(
+    list=extend_schema(description="Returns thread list."),
+    destroy=extend_schema(description="Deletes a thread."),
+)
 class ThreadViewSet(
     mixins.DestroyModelMixin,
     mixins.ListModelMixin,
@@ -54,6 +59,12 @@ class ThreadViewSet(
             case "message_list" | "mark_message_as_read":
                 return MessageSerializer
 
+    @extend_schema(
+        responses={
+            status.HTTP_200_OK: ThreadSerializer,
+            status.HTTP_201_CREATED: ThreadSerializer,
+        }
+    )
     def create(self, *args, **kwargs):
         """
         Creates a thread. If a thread with particular participants
@@ -74,7 +85,7 @@ class ThreadViewSet(
 
         return Response(ThreadSerializer(thread).data, status=response_status)
 
-    @action(methods=["GET"], detail=True, url_path="messages")
+    @action(methods=["GET"], detail=False, url_path=r"(?P<pk>\d+)/messages")
     def message_list(self, *args, **kwargs):
         """
         Returns thread message list.
@@ -94,6 +105,16 @@ class ThreadViewSet(
         serializer.save(thread=self.get_object(), sender=self.request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+    @extend_schema(
+        responses={
+            status.HTTP_200_OK: inline_serializer(
+                name="UnreadMessagesSerializer",
+                fields={
+                    "count": serializers.IntegerField(),
+                },
+            )
+        }
+    )
     @action(methods=["GET"], detail=True, url_path="unread-messages")
     def get_unread_messages_number(self, *args, **kwargs):
         """
@@ -103,6 +124,7 @@ class ThreadViewSet(
         unread_messages = thread.messages.unread_by_participant(self.request.user)
         return Response({"count": unread_messages.count()})
 
+    @extend_schema(request=None)
     @action(
         methods=["POST"],
         detail=True,

@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # third-party apps
     "django_filters",
+    "drf_spectacular",
     "rest_framework",
     "rest_framework_simplejwt",
     # first-party apps
@@ -96,5 +97,4 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 SILENCED_SYSTEM_CHECKS = [
     "auth.E003",
-    # "models.E034",
 ]
