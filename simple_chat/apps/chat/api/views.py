@@ -100,9 +100,10 @@ class ThreadViewSet(
         """
         Creates a thread message.
         """
+        thread = self.get_object()
         serializer = self.get_serializer(data=self.request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(thread=self.get_object(), sender=self.request.user)
+        serializer.save(thread=thread, sender=self.request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @extend_schema(
